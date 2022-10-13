@@ -80,6 +80,12 @@ class FDiskLruCache private constructor(
         }
     }
 
+    @Synchronized
+    fun size(): Long {
+        val cache = openCache() ?: return 0L
+        return cache.size()
+    }
+
     /**
      * 编辑文件
      */
