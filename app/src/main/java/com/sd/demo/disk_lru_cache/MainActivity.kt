@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.sd.demo.disk_lru_cache.databinding.ActivityMainBinding
-import com.sd.lib.dlcache.FDiskLruCache
+import com.sd.lib.dlcache.SimpleDiskLruCache
 import com.sd.lib.io.FFileUtils
 import com.sd.lib.io.FIOUtils
 import com.sd.lib.io.dir.ext.FDirTemp
@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity() {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
     private val _diskLruCache by lazy {
-        FDiskLruCache.dir(FFileUtils.getCacheDir("app_cache"))
+        SimpleDiskLruCache.dir(FFileUtils.getCacheDir("app_cache"))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

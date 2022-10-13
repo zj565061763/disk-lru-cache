@@ -5,10 +5,10 @@ import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
 
-class FDiskLruCache private constructor(
+class SimpleDiskLruCache private constructor(
     directory: File,
     maxSize: Long,
-) {
+) : IDiskLruCache {
     init {
         require(maxSize > 0) { "require maxSize > 0" }
     }
@@ -23,7 +23,7 @@ class FDiskLruCache private constructor(
      * 设置最大容量
      */
     @Synchronized
-    fun setMaxSize(maxSize: Long) {
+    override fun setMaxSize(maxSize: Long) {
         require(maxSize > 0) { "require maxSize > 0" }
         if (_maxSize != maxSize) {
             _maxSize = maxSize
@@ -32,7 +32,7 @@ class FDiskLruCache private constructor(
     }
 
     @Synchronized
-    fun put(key: String, file: File?): Boolean {
+    override fun put(key: String, file: File?): Boolean {
         if (file == null) return false
         if (!file.exists()) return false
         if (!file.isFile) return false
@@ -47,7 +47,7 @@ class FDiskLruCache private constructor(
     }
 
     @Synchronized
-    fun get(key: String): File? {
+    override fun get(key: String): File? {
         if (key.isEmpty()) return null
         val cache = openCache() ?: return null
 
@@ -63,7 +63,7 @@ class FDiskLruCache private constructor(
     }
 
     @Synchronized
-    fun remove(key: String): Boolean {
+    override fun remove(key: String): Boolean {
         if (key.isEmpty()) return false
         val cache = openCache() ?: return false
 
@@ -78,7 +78,7 @@ class FDiskLruCache private constructor(
     }
 
     @Synchronized
-    fun size(): Long {
+    override fun size(): Long {
         val cache = openCache() ?: return 0L
         return cache.size()
     }
@@ -87,7 +87,7 @@ class FDiskLruCache private constructor(
      * 编辑文件
      */
     @Synchronized
-    fun edit(key: String, block: (editFile: File) -> Boolean): Boolean {
+    override fun edit(key: String, block: (editFile: File) -> Boolean): Boolean {
         if (key.isEmpty()) return false
         val cache = openCache() ?: return false
 
@@ -154,14 +154,14 @@ class FDiskLruCache private constructor(
     }
 
     companion object {
-        private val _cacheMap: MutableMap<String, FDiskLruCache> = mutableMapOf()
+        private val _cacheMap: MutableMap<String, SimpleDiskLruCache> = mutableMapOf()
 
         @JvmOverloads
         @JvmStatic
-        fun dir(directory: File, maxSize: Long = 500 * 1024 * 1024): FDiskLruCache {
+        fun dir(directory: File, maxSize: Long = 500 * 1024 * 1024): SimpleDiskLruCache {
             return synchronized(this@Companion) {
                 val path = directory.absolutePath
-                _cacheMap[path] ?: FDiskLruCache(directory, maxSize).also {
+                _cacheMap[path] ?: SimpleDiskLruCache(directory, maxSize).also {
                     _cacheMap[path] = it
                 }
             }.also {
@@ -171,7 +171,7 @@ class FDiskLruCache private constructor(
     }
 }
 
-private class MD5KeyTransform : FDiskLruCache.KeyTransform {
+private class MD5KeyTransform : SimpleDiskLruCache.KeyTransform {
     override fun transform(key: String): String {
         return md5(key)
     }
