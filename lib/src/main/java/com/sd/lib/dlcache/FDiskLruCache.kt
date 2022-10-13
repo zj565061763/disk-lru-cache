@@ -56,8 +56,8 @@ class FDiskLruCache private constructor(
         check(key.isNotEmpty()) { "transform key is empty" }
 
         return try {
-            val value = cache.get(key)
-            value?.getFile(0)
+            val file = cache.get(key)?.getFile(0)
+            if (file?.exists() == true) file else null
         } catch (e: IOException) {
             e.printStackTrace()
             null
