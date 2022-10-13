@@ -49,6 +49,11 @@ class MainActivity : AppCompatActivity() {
         _diskLruCache.remove("key")
     }
 
+    override fun onStop() {
+        super.onStop()
+        _diskLruCache.close()
+    }
+
     companion object {
         const val TAG = "MainActivity"
     }
