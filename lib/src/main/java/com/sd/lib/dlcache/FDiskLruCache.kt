@@ -29,4 +29,8 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
     override fun edit(key: String, block: (editFile: File) -> Boolean): Boolean {
         return _cache.edit(key, block)
     }
+
+    override fun close() {
+        _cache.close()
+    }
 }

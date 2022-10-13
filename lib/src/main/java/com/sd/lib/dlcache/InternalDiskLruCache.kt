@@ -122,6 +122,10 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         }
     }
 
+    override fun close() {
+        closeDir(_directory)
+    }
+
     @Synchronized
     private fun openCache(): DiskLruCache? {
         val cache = _diskLruCache
@@ -135,6 +139,14 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
             e.printStackTrace()
             null
         }
+    }
+
+    @Synchronized
+    private fun closeCache() {
+        _diskLruCache?.close()
+        /**
+         * 不要将_diskLruCache置为null，否则[openCache]重新打开的话，有可能造成多个对象管理同一个目录
+         */
     }
 
     private fun transformKey(key: String): String {
@@ -157,6 +169,13 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
                     _cacheMap[path] = it
                 }
             }
+        }
+
+        private fun closeDir(directory: File) {
+            synchronized(this@Companion) {
+                val path = directory.absolutePath
+                _cacheMap.remove(path)
+            }?.closeCache()
         }
     }
 }

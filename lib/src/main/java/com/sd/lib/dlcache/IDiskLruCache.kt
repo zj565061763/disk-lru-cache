@@ -15,4 +15,6 @@ interface IDiskLruCache {
     fun size(): Long
 
     fun edit(key: String, block: (editFile: File) -> Boolean): Boolean
+
+    fun close()
 }
