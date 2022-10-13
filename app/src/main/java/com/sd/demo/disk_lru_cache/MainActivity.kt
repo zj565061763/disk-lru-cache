@@ -27,6 +27,9 @@ class MainActivity : AppCompatActivity() {
         _binding.btnGet.setOnClickListener {
             getCache()
         }
+        _binding.btnRemove.setOnClickListener {
+            removeCache()
+        }
     }
 
     private fun putCache() {
@@ -39,6 +42,10 @@ class MainActivity : AppCompatActivity() {
     private fun getCache() {
         val file = _diskLruCache.get("key") ?: return
         Log.i(TAG, FIOUtils.readText(file) ?: "")
+    }
+
+    private fun removeCache() {
+        _diskLruCache.remove("key")
     }
 
     companion object {
