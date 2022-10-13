@@ -36,7 +36,7 @@ class FDiskLruCache private constructor(
     fun put(key: String, file: File?): Boolean {
         if (file == null) return false
         if (!file.exists()) return false
-        if (file.isDirectory) return false
+        if (!file.isFile) return false
         return edit(key) { editFile ->
             try {
                 file.copyTo(editFile, overwrite = true)
