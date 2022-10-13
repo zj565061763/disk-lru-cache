@@ -145,7 +145,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     private fun closeCache() {
         _diskLruCache?.close()
         /**
-         * 不要将_diskLruCache置为null，否则[openCache]重新打开的话，有可能造成多个对象管理同一个目录
+         * 不要把_diskLruCache设置为null，否则[openCache]重新打开的话，有可能造成多个对象管理同一个目录
          */
     }
 
