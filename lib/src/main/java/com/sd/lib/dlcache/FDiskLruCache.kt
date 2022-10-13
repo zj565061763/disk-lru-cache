@@ -38,5 +38,6 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
 
     override fun close() {
         _cache?.close()
+        _cache = null
     }
 }
