@@ -5,8 +5,12 @@ import java.io.File
 class FDiskLruCache(directory: File) : IDiskLruCache {
 
     private val _directory = directory
+    private var _cache: IDiskLruCache? = null
+
     private val cache: IDiskLruCache
-        get() = InternalDiskLruCache.dir(_directory)
+        get() = InternalDiskLruCache.dir(_directory).also {
+            _cache = it
+        }
 
     override fun setMaxSize(maxSize: Long) {
         cache.setMaxSize(maxSize)
@@ -33,6 +37,6 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
     }
 
     override fun close() {
-        cache.close()
+        _cache?.close()
     }
 }
