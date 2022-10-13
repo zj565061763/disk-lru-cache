@@ -149,7 +149,7 @@ class FDiskLruCache private constructor(
         }
     }
 
-    fun interface KeyTransform {
+    internal fun interface KeyTransform {
         fun transform(key: String): String
     }
 
@@ -171,7 +171,7 @@ class FDiskLruCache private constructor(
     }
 }
 
-class MD5KeyTransform : FDiskLruCache.KeyTransform {
+private class MD5KeyTransform : FDiskLruCache.KeyTransform {
     override fun transform(key: String): String {
         return md5(key)
     }
