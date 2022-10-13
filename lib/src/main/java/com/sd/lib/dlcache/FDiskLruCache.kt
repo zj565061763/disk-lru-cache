@@ -17,8 +17,7 @@ class FDiskLruCache private constructor(
     private var _maxSize = maxSize
 
     private var _diskLruCache: DiskLruCache? = null
-
-    var keyTransform: KeyTransform = MD5KeyTransform()
+    private var _keyTransform = MD5KeyTransform()
 
     /**
      * 设置最大容量
@@ -52,8 +51,7 @@ class FDiskLruCache private constructor(
         if (key.isEmpty()) return null
         val cache = openCache() ?: return null
 
-        val key = keyTransform.transform(key)
-        check(key.isNotEmpty()) { "transform key is empty" }
+        val key = transformKey(key)
 
         return try {
             val file = cache.get(key)?.getFile(0)
@@ -69,8 +67,7 @@ class FDiskLruCache private constructor(
         if (key.isEmpty()) return false
         val cache = openCache() ?: return false
 
-        val key = keyTransform.transform(key)
-        check(key.isNotEmpty()) { "transform key is empty" }
+        val key = transformKey(key)
 
         return try {
             cache.remove(key)
@@ -94,8 +91,7 @@ class FDiskLruCache private constructor(
         if (key.isEmpty()) return false
         val cache = openCache() ?: return false
 
-        val key = keyTransform.transform(key)
-        check(key.isNotEmpty()) { "transform key is empty" }
+        val key = transformKey(key)
 
         val editor = try {
             cache.edit(key)
@@ -144,6 +140,12 @@ class FDiskLruCache private constructor(
         } catch (e: IOException) {
             e.printStackTrace()
             null
+        }
+    }
+
+    private fun transformKey(key: String): String {
+        return _keyTransform.transform(key).also {
+            check(it.isNotEmpty()) { "transform key is empty" }
         }
     }
 
