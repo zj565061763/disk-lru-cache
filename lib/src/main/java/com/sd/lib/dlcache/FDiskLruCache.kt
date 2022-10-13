@@ -102,12 +102,15 @@ class FDiskLruCache private constructor(
             editor.getFile(0)
         } catch (e: IOException) {
             e.printStackTrace()
-            editor.abortQuietly()
             null
-        } ?: return false
+        }
+
+        if (file == null) {
+            editor.abortQuietly()
+            return false
+        }
 
         if (!block(file)) {
-            // 如果操作失败，不提交
             editor.abortQuietly()
             return false
         }
