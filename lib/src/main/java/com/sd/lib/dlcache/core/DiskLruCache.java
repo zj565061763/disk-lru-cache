@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sd.lib.dlcache;
+package com.sd.lib.dlcache.core;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION;
