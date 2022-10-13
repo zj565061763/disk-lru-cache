@@ -5,16 +5,10 @@ import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
 
-class SimpleDiskLruCache private constructor(
-    directory: File,
-    maxSize: Long,
-) : IDiskLruCache {
-    init {
-        require(maxSize > 0) { "require maxSize > 0" }
-    }
+internal class InternalDiskLruCache private constructor(directory: File) : IDiskLruCache {
 
     private val _directory = directory
-    private var _maxSize = maxSize
+    private var _maxSize = 500 * 1024 * 1024L
 
     private var _diskLruCache: DiskLruCache? = null
     private var _keyTransform = MD5KeyTransform()
@@ -154,24 +148,20 @@ class SimpleDiskLruCache private constructor(
     }
 
     companion object {
-        private val _cacheMap: MutableMap<String, SimpleDiskLruCache> = mutableMapOf()
+        private val _cacheMap: MutableMap<String, InternalDiskLruCache> = mutableMapOf()
 
-        @JvmOverloads
-        @JvmStatic
-        fun dir(directory: File, maxSize: Long = 500 * 1024 * 1024): SimpleDiskLruCache {
+        fun dir(directory: File): InternalDiskLruCache {
             return synchronized(this@Companion) {
                 val path = directory.absolutePath
-                _cacheMap[path] ?: SimpleDiskLruCache(directory, maxSize).also {
+                _cacheMap[path] ?: InternalDiskLruCache(directory).also {
                     _cacheMap[path] = it
                 }
-            }.also {
-                it.setMaxSize(maxSize)
             }
         }
     }
 }
 
-private class MD5KeyTransform : SimpleDiskLruCache.KeyTransform {
+private class MD5KeyTransform : InternalDiskLruCache.KeyTransform {
     override fun transform(key: String): String {
         return md5(key)
     }
