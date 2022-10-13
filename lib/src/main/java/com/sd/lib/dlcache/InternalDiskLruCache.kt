@@ -155,7 +155,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         }
     }
 
-    internal fun interface KeyTransform {
+    fun interface KeyTransform {
         fun transform(key: String): String
     }
 
