@@ -41,8 +41,16 @@ class ExampleInstrumentedTest {
         assertEquals(null, cacheRemove.get("key"))
 
         // cache id
-        assert(cachePut.cacheId == cacheGet.cacheId)
-        assert(cachePut.cacheId == cacheRemove.cacheId)
+        val cacheId = cachePut.cacheId
+        assertEquals(cacheId, cachePut.cacheId)
+        assertEquals(cacheId, cacheGet.cacheId)
+        assertEquals(cacheId, cacheRemove.cacheId)
+
+        // close
+        cachePut.close()
+        assertNotEquals(cacheId, cachePut.cacheId)
+        assertNotEquals(cacheId, cacheGet.cacheId)
+        assertNotEquals(cacheId, cacheRemove.cacheId)
     }
 
     private fun getCache(): FDiskLruCache {
