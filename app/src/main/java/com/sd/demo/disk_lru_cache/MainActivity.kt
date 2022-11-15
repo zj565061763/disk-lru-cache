@@ -5,17 +5,15 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.sd.demo.disk_lru_cache.databinding.ActivityMainBinding
 import com.sd.lib.dlcache.FDiskLruCache
-import com.sd.lib.io.FFileUtils
-import com.sd.lib.io.FIOUtils
-import com.sd.lib.io.dir.ext.FDirTemp
+import java.io.File
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
     private val _diskLruCache by lazy {
-        val dir = FFileUtils.getCacheDir("app_cache")
-        FDiskLruCache(dir)
+        val directory = externalCacheDir!!
+        FDiskLruCache(directory)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,27 +32,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun putCache() {
-        val tempFile = FDirTemp.newFile("txt")
-        FIOUtils.writeText(UUID.randomUUID().toString(), tempFile)
+        val fileContent = UUID.randomUUID().toString()
+        val tempFile = File.createTempFile("lru", ".tmp").apply {
+            writeText(fileContent)
+        }
 
-        _diskLruCache.put("key", tempFile)
+        val put = _diskLruCache.put("key", tempFile)
+        tempFile.delete()
+
+        logMsg { "putCache $fileContent $put" }
     }
 
     private fun getCache() {
-        val file = _diskLruCache.get("key") ?: return
-        Log.i(TAG, FIOUtils.readText(file) ?: "")
+        val readContent = _diskLruCache.get("key")?.readText()
+        logMsg { "getCache $readContent" }
     }
 
     private fun removeCache() {
-        _diskLruCache.remove("key")
+        val remove = _diskLruCache.remove("key")
+        logMsg { "removeCache $remove" }
     }
 
     override fun onStop() {
         super.onStop()
         _diskLruCache.close()
     }
+}
 
-    companion object {
-        const val TAG = "MainActivity"
-    }
+fun logMsg(block: () -> String) {
+    Log.i("disk-lru-cache-demo", block())
 }
