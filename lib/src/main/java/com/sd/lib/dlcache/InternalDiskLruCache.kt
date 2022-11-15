@@ -153,7 +153,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     companion object {
         private val _cacheHolder: MutableMap<String, InternalDiskLruCache> = mutableMapOf()
 
-        fun dir(directory: File): InternalDiskLruCache {
+        fun dir(directory: File): IDiskLruCache {
             return synchronized(this@Companion) {
                 val path = directory.absolutePath
                 _cacheHolder[path] ?: InternalDiskLruCache(directory).also {
