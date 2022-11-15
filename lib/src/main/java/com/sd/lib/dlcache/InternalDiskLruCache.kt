@@ -25,7 +25,6 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         }
     }
 
-    @Synchronized
     override fun put(key: String, file: File?): Boolean {
         if (file == null) return false
         if (!file.exists()) return false
@@ -141,14 +140,6 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         }
     }
 
-    @Synchronized
-    private fun closeCache() {
-        _diskLruCache?.close()
-        /**
-         * 不要把_diskLruCache设置为null，否则[openCache]重新打开的话，有可能造成多个对象管理同一个目录
-         */
-    }
-
     private fun transformKey(key: String): String {
         return _keyTransform.transform(key).also {
             check(it.isNotEmpty()) { "transform key is empty" }
@@ -160,13 +151,13 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     }
 
     companion object {
-        private val _cacheMap: MutableMap<String, InternalDiskLruCache> = mutableMapOf()
+        private val _cacheHolder: MutableMap<String, InternalDiskLruCache> = mutableMapOf()
 
         fun dir(directory: File): InternalDiskLruCache {
             return synchronized(this@Companion) {
                 val path = directory.absolutePath
-                _cacheMap[path] ?: InternalDiskLruCache(directory).also {
-                    _cacheMap[path] = it
+                _cacheHolder[path] ?: InternalDiskLruCache(directory).also {
+                    _cacheHolder[path] = it
                 }
             }
         }
@@ -174,8 +165,10 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         private fun closeDir(directory: File) {
             synchronized(this@Companion) {
                 val path = directory.absolutePath
-                _cacheMap.remove(path)
-            }?.closeCache()
+                _cacheHolder.remove(path)?.let { cache ->
+                    cache._diskLruCache?.close()
+                }
+            }
         }
     }
 }
