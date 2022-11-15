@@ -1,12 +1,14 @@
 package com.sd.demo.disk_lru_cache
 
-import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
-
+import androidx.test.platform.app.InstrumentationRegistry
+import com.sd.lib.dlcache.FDiskLruCache
+import com.sd.lib.dlcache.IDiskLruCache
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import org.junit.Assert.*
+import java.io.File
+import java.util.*
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -15,10 +17,26 @@ import org.junit.Assert.*
  */
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+
     @Test
-    fun useAppContext() {
-        // Context of the app under test.
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.sd.demo.disk_lru_cache", appContext.packageName)
+    fun testCache() {
+        val fileContent = UUID.randomUUID().toString()
+        val tempFile = File.createTempFile("lru", ".tmp").apply {
+            writeText(fileContent)
+        }
+
+        assertEquals(true, getCache().put("key", tempFile))
+        tempFile.delete()
+
+        val readFile = getCache().get("key")
+        val readContent = readFile?.readText()
+
+        assertEquals(fileContent, readContent)
+    }
+
+    private fun getCache(): IDiskLruCache {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val directory = context.externalCacheDir!!
+        return FDiskLruCache(directory)
     }
 }
