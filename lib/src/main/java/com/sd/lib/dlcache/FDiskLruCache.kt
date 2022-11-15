@@ -12,6 +12,9 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
             _cache = it
         }
 
+    val cacheId: String
+        get() = cache.toString()
+
     override fun setMaxSize(maxSize: Long) {
         cache.setMaxSize(maxSize)
     }
