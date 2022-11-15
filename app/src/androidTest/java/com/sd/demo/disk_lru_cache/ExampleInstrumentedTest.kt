@@ -25,13 +25,18 @@ class ExampleInstrumentedTest {
             writeText(fileContent)
         }
 
+        // put
         assertEquals(true, getCache().put("key", tempFile))
         tempFile.delete()
 
+        // get
         val readFile = getCache().get("key")
         val readContent = readFile?.readText()
-
         assertEquals(fileContent, readContent)
+
+        // remove
+        assertEquals(true, getCache().remove("key"))
+        assertEquals(null, getCache().get("key"))
     }
 
     private fun getCache(): IDiskLruCache {
