@@ -3,6 +3,7 @@ package com.sd.demo.disk_lru_cache
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sd.lib.dlcache.FDiskLruCache
+import com.sd.lib.dlcache.IDiskLruCache
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,38 +20,62 @@ class ExampleInstrumentedTest {
 
     @Test
     fun testCache() {
+        val cachePut = getCache()
+        val cacheGet = getCache()
+        val cacheRemove = getCache()
+
+        // test
+        testPutGetRemove(
+            cachePut = cachePut,
+            cacheGet = cacheGet,
+            cacheRemove = cacheRemove,
+        )
+
+        // cache id
+        val oldCacheId = cachePut.cacheId
+        assertEquals(oldCacheId, cachePut.cacheId)
+        assertEquals(oldCacheId, cacheGet.cacheId)
+        assertEquals(oldCacheId, cacheRemove.cacheId)
+
+        // close
+        cachePut.close()
+        val newCacheId = cachePut.cacheId
+        assertNotEquals(newCacheId, oldCacheId)
+
+        assertEquals(newCacheId, cachePut.cacheId)
+        assertEquals(newCacheId, cacheGet.cacheId)
+        assertEquals(newCacheId, cacheRemove.cacheId)
+
+        // test
+        testPutGetRemove(
+            cachePut = cachePut,
+            cacheGet = cacheGet,
+            cacheRemove = cacheRemove,
+        )
+    }
+
+    private fun testPutGetRemove(
+        cachePut: IDiskLruCache,
+        cacheGet: IDiskLruCache,
+        cacheRemove: IDiskLruCache,
+    ) {
         val fileContent = UUID.randomUUID().toString()
         val tempFile = File.createTempFile("lru", ".tmp").apply {
             writeText(fileContent)
         }
 
         // put
-        val cachePut = getCache()
         assertEquals(true, cachePut.put("key", tempFile))
         tempFile.delete()
 
         // get
-        val cacheGet = getCache()
         val readFile = cacheGet.get("key")
         val readContent = readFile?.readText()
         assertEquals(fileContent, readContent)
 
         // remove
-        val cacheRemove = getCache()
         assertEquals(true, cacheRemove.remove("key"))
         assertEquals(null, cacheRemove.get("key"))
-
-        // cache id
-        val cacheId = cachePut.cacheId
-        assertEquals(cacheId, cachePut.cacheId)
-        assertEquals(cacheId, cacheGet.cacheId)
-        assertEquals(cacheId, cacheRemove.cacheId)
-
-        // close
-        cachePut.close()
-        assertNotEquals(cacheId, cachePut.cacheId)
-        assertNotEquals(cacheId, cacheGet.cacheId)
-        assertNotEquals(cacheId, cacheRemove.cacheId)
     }
 
     private fun getCache(): FDiskLruCache {
