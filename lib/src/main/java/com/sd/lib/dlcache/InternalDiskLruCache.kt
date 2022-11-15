@@ -6,12 +6,11 @@ import java.io.IOException
 import java.security.MessageDigest
 
 internal class InternalDiskLruCache private constructor(directory: File) : IDiskLruCache {
-
     private val _directory = directory
-    private var _maxSize = 500 * 1024 * 1024L
+    private val _keyTransform = MD5KeyTransform()
 
+    private var _maxSize = 500 * 1024 * 1024L
     private var _diskLruCache: DiskLruCache? = null
-    private var _keyTransform = MD5KeyTransform()
 
     /**
      * 设置最大容量
@@ -175,15 +174,11 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
 
 private class MD5KeyTransform : InternalDiskLruCache.KeyTransform {
     override fun transform(key: String): String {
-        return md5(key)
-    }
-
-    private fun md5(content: String): String {
         return try {
-            val bytes = MessageDigest.getInstance("MD5").digest(content.toByteArray())
+            val bytes = MessageDigest.getInstance("MD5").digest(key.toByteArray())
             bytes.joinToString("") { "%02X".format(it) }
         } catch (e: Exception) {
-            content
+            key
         }
     }
 }
