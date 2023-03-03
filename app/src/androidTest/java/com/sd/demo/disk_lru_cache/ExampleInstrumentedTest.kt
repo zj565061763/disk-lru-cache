@@ -47,12 +47,14 @@ class ExampleInstrumentedTest {
         tempFile.delete()
 
         // get
-        val readFile = cacheGet.get("key")
-        val readContent = readFile?.readText()
-        assertEquals(fileContent, readContent)
+        assertEquals(fileContent, cachePut.get("key")?.readText())
+        assertEquals(fileContent, cacheGet.get("key")?.readText())
+        assertEquals(fileContent, cacheRemove.get("key")?.readText())
 
         // remove
         assertEquals(true, cacheRemove.remove("key"))
+        assertEquals(null, cachePut.get("key"))
+        assertEquals(null, cacheGet.get("key"))
         assertEquals(null, cacheRemove.get("key"))
     }
 
