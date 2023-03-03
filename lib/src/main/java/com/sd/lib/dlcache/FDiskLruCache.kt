@@ -7,7 +7,7 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
     private var _cache: IDiskLruCache? = null
 
     private val cache: IDiskLruCache
-        get() = InternalDiskLruCache.dir(_directory).also {
+        get() = InternalDiskLruCache.open(_directory).also {
             _cache = it
         }
 
@@ -36,10 +36,5 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
 
     override fun edit(key: String, block: (editFile: File) -> Boolean): Boolean {
         return cache.edit(key, block)
-    }
-
-    override fun close() {
-        _cache?.close()
-        _cache = null
     }
 }

@@ -52,11 +52,6 @@ class MainActivity : AppCompatActivity() {
         val remove = _diskLruCache.remove("key")
         logMsg { "removeCache $remove" }
     }
-
-    override fun onStop() {
-        super.onStop()
-        _diskLruCache.close()
-    }
 }
 
 fun logMsg(block: () -> String) {
