@@ -30,12 +30,6 @@ class ExampleInstrumentedTest {
             cacheGet = cacheGet,
             cacheRemove = cacheRemove,
         )
-
-        // cache id
-        val cacheId = cachePut.cacheId
-        assertEquals(cacheId, cachePut.cacheId)
-        assertEquals(cacheId, cacheGet.cacheId)
-        assertEquals(cacheId, cacheRemove.cacheId)
     }
 
     private fun testPutGetRemove(

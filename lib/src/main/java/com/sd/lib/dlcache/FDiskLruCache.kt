@@ -8,9 +8,6 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
     private val cache: IDiskLruCache
         get() = InternalDiskLruCache.open(_directory)
 
-    val cacheId: String
-        get() = cache.toString()
-
     init {
         require(directory.isDirectory)
         addCount(directory)
