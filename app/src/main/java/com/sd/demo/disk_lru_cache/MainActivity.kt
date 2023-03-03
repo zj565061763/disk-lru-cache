@@ -10,11 +10,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-
-    private val _diskLruCache by lazy {
-        val directory = externalCacheDir!!
-        FDiskLruCache(directory)
-    }
+    private val _cache by lazy { FDiskLruCache(externalCacheDir!!) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,19 +34,19 @@ class MainActivity : AppCompatActivity() {
             writeText(fileContent)
         }
 
-        val put = _diskLruCache.put("key", tempFile)
+        val put = _cache.put("key", tempFile)
         tempFile.delete()
 
         logMsg { "putCache $fileContent $put" }
     }
 
     private fun getCache() {
-        val readContent = _diskLruCache.get("key")?.readText()
+        val readContent = _cache.get("key")?.readText()
         logMsg { "getCache $readContent" }
     }
 
     private fun removeCache() {
-        val remove = _diskLruCache.remove("key")
+        val remove = _cache.remove("key")
         logMsg { "removeCache $remove" }
     }
 
