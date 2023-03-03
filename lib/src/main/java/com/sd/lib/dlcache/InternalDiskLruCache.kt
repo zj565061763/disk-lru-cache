@@ -12,9 +12,6 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     private var _maxSize = 200 * 1024 * 1024L
     private var _cache: DiskLruCache? = null
 
-    /**
-     * 设置最大容量
-     */
     @Synchronized
     override fun setMaxSize(maxSize: Long) {
         require(maxSize > 0) { "require maxSize > 0" }
@@ -75,9 +72,6 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         return cache.size()
     }
 
-    /**
-     * 编辑文件
-     */
     @Synchronized
     override fun edit(key: String, block: (editFile: File) -> Boolean): Boolean {
         if (key.isEmpty()) return false
