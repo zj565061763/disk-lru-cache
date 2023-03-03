@@ -9,7 +9,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     private val _directory = directory
     private val _keyTransform = MD5KeyTransform()
 
-    private var _maxSize = 500 * 1024 * 1024L
+    private var _maxSize = 200 * 1024 * 1024L
     private var _diskLruCache: DiskLruCache? = null
 
     /**
