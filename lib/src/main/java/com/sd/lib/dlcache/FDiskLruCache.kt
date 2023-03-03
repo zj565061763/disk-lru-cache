@@ -59,11 +59,10 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
                 val path = directory.absolutePath
                 val counter = _counterHolder[path] ?: error("Directory was not found $path")
                 counter.decrementAndGet().also {
-                    if (it <= 0) {
-                        _counterHolder.remove(path)
-                        InternalDiskLruCache.close(directory)
-                    }
+                    if (it <= 0) _counterHolder.remove(path)
                 }
+            }.also {
+                if (it <= 0) InternalDiskLruCache.close(directory)
             }
         }
     }
