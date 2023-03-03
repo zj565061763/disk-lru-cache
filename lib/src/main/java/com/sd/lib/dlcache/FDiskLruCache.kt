@@ -3,7 +3,6 @@ package com.sd.lib.dlcache
 import java.io.File
 
 class FDiskLruCache(directory: File) : IDiskLruCache {
-
     private val _directory = directory
     private var _cache: IDiskLruCache? = null
 
