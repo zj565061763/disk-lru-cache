@@ -10,7 +10,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     private val _keyTransform = MD5KeyTransform()
 
     private var _maxSize = 200 * 1024 * 1024L
-    private var _diskLruCache: DiskLruCache? = null
+    private var _cache: DiskLruCache? = null
 
     /**
      * 设置最大容量
@@ -20,7 +20,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         require(maxSize > 0) { "require maxSize > 0" }
         if (_maxSize != maxSize) {
             _maxSize = maxSize
-            _diskLruCache?.maxSize = maxSize
+            _cache?.maxSize = maxSize
         }
     }
 
@@ -126,12 +126,12 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
 
     @Synchronized
     private fun openCache(): DiskLruCache? {
-        val cache = _diskLruCache
+        val cache = _cache
         if (cache != null) return cache
 
         return try {
             DiskLruCache.open(_directory, 1, 1, _maxSize).also {
-                _diskLruCache = it
+                _cache = it
             }
         } catch (e: IOException) {
             e.printStackTrace()
@@ -165,7 +165,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
             synchronized(this@Companion) {
                 val path = directory.absolutePath
                 _cacheHolder.remove(path)?.let { cache ->
-                    cache._diskLruCache?.close()
+                    cache._cache?.close()
                 }
             }
         }
