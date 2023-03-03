@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(_binding.root)
+        logMsg { "onCreate" }
 
         _binding.btnPut.setOnClickListener {
             putCache()
@@ -51,6 +52,11 @@ class MainActivity : AppCompatActivity() {
     private fun removeCache() {
         val remove = _diskLruCache.remove("key")
         logMsg { "removeCache $remove" }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logMsg { "onDestroy" }
     }
 }
 
