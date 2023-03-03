@@ -12,6 +12,10 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     private var _maxSize = 200 * 1024 * 1024L
     private var _cache: DiskLruCache? = null
 
+    init {
+        require(directory.isDirectory)
+    }
+
     @Synchronized
     override fun setMaxSize(maxSize: Long) {
         require(maxSize > 0) { "require maxSize > 0" }
