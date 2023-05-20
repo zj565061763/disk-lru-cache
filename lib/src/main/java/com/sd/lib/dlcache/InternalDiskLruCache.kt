@@ -72,8 +72,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
 
     @Synchronized
     override fun size(): Long {
-        val cache = openCache() ?: return 0L
-        return cache.size()
+        return openCache()?.size() ?: 0L
     }
 
     @Synchronized
