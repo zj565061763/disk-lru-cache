@@ -152,13 +152,13 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     }
 
     companion object {
-        private val _cacheHolder: MutableMap<String, InternalDiskLruCache> = hashMapOf()
+        private val sInstanceHolder: MutableMap<String, InternalDiskLruCache> = hashMapOf()
 
         fun open(directory: File): IDiskLruCache {
             return synchronized(this@Companion) {
                 val path = directory.absolutePath
-                _cacheHolder[path] ?: InternalDiskLruCache(directory).also {
-                    _cacheHolder[path] = it
+                sInstanceHolder[path] ?: InternalDiskLruCache(directory).also {
+                    sInstanceHolder[path] = it
                 }
             }
         }
@@ -166,7 +166,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         fun close(directory: File) {
             synchronized(this@Companion) {
                 val path = directory.absolutePath
-                _cacheHolder.remove(path)?.closeCache()
+                sInstanceHolder.remove(path)?.closeCache()
             }
         }
     }
