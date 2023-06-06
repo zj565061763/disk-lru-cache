@@ -42,13 +42,13 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
     }
 
     companion object {
-        private val _counterHolder: MutableMap<String, AtomicInteger> = hashMapOf()
+        private val sCounterHolder: MutableMap<String, AtomicInteger> = hashMapOf()
 
         private fun addCount(directory: File) {
             synchronized(InternalDiskLruCache.Companion) {
                 val path = directory.absolutePath
-                val counter = _counterHolder[path] ?: AtomicInteger(0).also {
-                    _counterHolder[path] = it
+                val counter = sCounterHolder[path] ?: AtomicInteger(0).also {
+                    sCounterHolder[path] = it
                 }
                 counter.incrementAndGet()
             }
@@ -57,10 +57,10 @@ class FDiskLruCache(directory: File) : IDiskLruCache {
         private fun removeCount(directory: File) {
             synchronized(InternalDiskLruCache.Companion) {
                 val path = directory.absolutePath
-                val counter = _counterHolder[path] ?: error("Directory was not found $path")
+                val counter = sCounterHolder[path] ?: error("Directory was not found $path")
                 counter.decrementAndGet().let {
                     if (it <= 0) {
-                        _counterHolder.remove(path)
+                        sCounterHolder.remove(path)
                         InternalDiskLruCache.close(directory)
                     }
                 }
