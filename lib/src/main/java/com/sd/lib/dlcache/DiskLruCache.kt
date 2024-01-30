@@ -193,10 +193,9 @@ private class DiskLruCacheImpl(
     }
 }
 
-private fun md5(key: String): String {
-    val bytes = key.toByteArray()
+private fun md5(content: String): String {
     return MessageDigest.getInstance("MD5")
-        .digest(bytes)
+        .digest(content.toByteArray())
         .joinToString("") { "%02X".format(it) }
 }
 
