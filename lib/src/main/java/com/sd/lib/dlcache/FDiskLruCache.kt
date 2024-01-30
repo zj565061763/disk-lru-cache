@@ -1,7 +1,6 @@
 package com.sd.lib.dlcache
 
 import com.sd.lib.closeable.FAutoCloseFactory
-import com.sd.lib.dlcache.core.DiskLruCache
 import java.io.File
 import java.io.IOException
 import java.security.MessageDigest

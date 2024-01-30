@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sd.lib.dlcache.core;
+package com.sd.lib.dlcache;
 
 import java.io.Closeable;
 import java.io.File;

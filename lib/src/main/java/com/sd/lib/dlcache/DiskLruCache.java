@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.sd.lib.dlcache.core;
+package com.sd.lib.dlcache;
 
 import android.annotation.TargetApi;
 import android.os.Build.VERSION;
@@ -87,7 +87,7 @@ import java.util.concurrent.TimeUnit;
  * Callers should handle other problems by catching {@code IOException} and
  * responding appropriately.
  */
-public final class DiskLruCache implements Closeable {
+final class DiskLruCache implements Closeable {
   static final String JOURNAL_FILE = "journal";
   static final String JOURNAL_FILE_TEMP = "journal.tmp";
   static final String JOURNAL_FILE_BACKUP = "journal.bkp";
