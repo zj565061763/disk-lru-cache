@@ -41,7 +41,7 @@ object FDiskLruCache {
     private val _factory = FAutoCloseFactory(CloseableDiskLruCache::class.java)
 
     @JvmStatic
-    fun create(directory: File): IDiskLruCache {
+    fun get(directory: File): IDiskLruCache {
         val path = directory.absolutePath
         return _factory.create(path) { DiskLruCacheImpl(directory) }
     }

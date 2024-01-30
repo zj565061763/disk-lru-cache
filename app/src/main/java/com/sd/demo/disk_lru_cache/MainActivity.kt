@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
     private var _cache: IDiskLruCache? = null
 
     private val cache: IDiskLruCache
-        get() = _cache ?: FDiskLruCache.create(externalCacheDir!!).also { _cache = it }
+        get() = _cache ?: FDiskLruCache.get(externalCacheDir!!).also { _cache = it }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

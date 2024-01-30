@@ -61,6 +61,6 @@ class ExampleInstrumentedTest {
     private fun getCache(): IDiskLruCache {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val directory = context.externalCacheDir!!
-        return FDiskLruCache.create(directory)
+        return FDiskLruCache.get(directory)
     }
 }
