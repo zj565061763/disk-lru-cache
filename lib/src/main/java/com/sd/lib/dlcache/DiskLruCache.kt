@@ -1,19 +1,64 @@
 package com.sd.lib.dlcache
 
+import com.sd.lib.closeable.FAutoCloseFactory
 import com.sd.lib.dlcache.core.DiskLruCache
 import java.io.File
 import java.io.IOException
 import java.security.MessageDigest
 
-internal class InternalDiskLruCache private constructor(directory: File) : IDiskLruCache {
-    private val _directory = directory
-    private val _keyTransform = MD5KeyTransform()
+interface IDiskLruCache {
+    /**
+     * 设置缓存最大值，单位byte
+     */
+    fun setMaxSize(maxSize: Long)
 
-    private var _maxSize = 250 * 1024 * 1024L
+    /**
+     * 保存文件到缓存
+     */
+    fun put(key: String, file: File?): Boolean
+
+    /**
+     * 获取[key]对应的缓存文件，返回的文件只能读取，不能做修改和删除
+     */
+    fun get(key: String): File?
+
+    /**
+     * 移除[key]对应的缓存
+     */
+    fun remove(key: String): Boolean
+
+    /**
+     * 当前缓存大小
+     */
+    fun size(): Long
+
+    /**
+     * 编辑[key]对应的缓存文件，[block]返回true表示编辑成功
+     */
+    fun edit(key: String, block: (editFile: File) -> Boolean): Boolean
+}
+
+object FDiskLruCache {
+    private val _factory = FAutoCloseFactory(CloseableDiskLruCache::class.java)
+
+    @JvmStatic
+    fun create(directory: File): IDiskLruCache {
+        val path = directory.absolutePath
+        return _factory.create(path) { DiskLruCacheImpl(directory) }
+    }
+}
+
+private interface CloseableDiskLruCache : IDiskLruCache, AutoCloseable
+
+private class DiskLruCacheImpl(
+    private val directory: File
+) : CloseableDiskLruCache {
+
     private var _cache: DiskLruCache? = null
+    private var _maxSize = 200 * 1024 * 1024L
 
     init {
-        require(directory.isDirectory)
+        if (directory.isFile) error("directory is file.")
     }
 
     @Synchronized
@@ -27,7 +72,6 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
 
     override fun put(key: String, file: File?): Boolean {
         if (file == null) return false
-        if (!file.exists()) return false
         if (!file.isFile) return false
         return edit(key) { editFile ->
             try {
@@ -44,11 +88,12 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         if (key.isEmpty()) return null
         val cache = openCache() ?: return null
 
+        @Suppress("NAME_SHADOWING")
         val key = transformKey(key)
 
         return try {
             val file = cache.get(key)?.getFile(0)
-            if (file?.exists() == true) file else null
+            if (file?.isFile == true) file else null
         } catch (e: IOException) {
             e.printStackTrace()
             null
@@ -60,6 +105,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         if (key.isEmpty()) return false
         val cache = openCache() ?: return false
 
+        @Suppress("NAME_SHADOWING")
         val key = transformKey(key)
 
         return try {
@@ -80,6 +126,7 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
         if (key.isEmpty()) return false
         val cache = openCache() ?: return false
 
+        @Suppress("NAME_SHADOWING")
         val key = transformKey(key)
 
         val editor = try {
@@ -111,21 +158,16 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
             true
         } catch (e: IOException) {
             e.printStackTrace()
+            editor.abortQuietly()
             false
-        } finally {
-            editor.abortUnlessCommitted()
         }
     }
 
     @Synchronized
     private fun openCache(): DiskLruCache? {
-        val cache = _cache
-        if (cache != null) return cache
-
+        _cache?.let { return it }
         return try {
-            DiskLruCache.open(_directory, 1, 1, _maxSize).also {
-                _cache = it
-            }
+            DiskLruCache.open(directory, 1, 1, _maxSize).also { _cache = it }
         } catch (e: IOException) {
             e.printStackTrace()
             null
@@ -133,54 +175,29 @@ internal class InternalDiskLruCache private constructor(directory: File) : IDisk
     }
 
     @Synchronized
-    private fun closeCache() {
+    override fun close() {
         try {
             _cache?.close()
         } catch (e: IOException) {
             e.printStackTrace()
+        } finally {
+            _cache = null
         }
     }
 
     private fun transformKey(key: String): String {
-        return _keyTransform.transform(key).also {
+        require(key.isNotEmpty())
+        return md5(key).also {
             check(it.isNotEmpty()) { "transform key is empty" }
-        }
-    }
-
-    fun interface KeyTransform {
-        fun transform(key: String): String
-    }
-
-    companion object {
-        private val sInstanceHolder: MutableMap<String, InternalDiskLruCache> = hashMapOf()
-
-        fun open(directory: File): IDiskLruCache {
-            return synchronized(this@Companion) {
-                val path = directory.absolutePath
-                sInstanceHolder[path] ?: InternalDiskLruCache(directory).also {
-                    sInstanceHolder[path] = it
-                }
-            }
-        }
-
-        fun close(directory: File) {
-            synchronized(this@Companion) {
-                val path = directory.absolutePath
-                sInstanceHolder.remove(path)?.closeCache()
-            }
         }
     }
 }
 
-private class MD5KeyTransform : InternalDiskLruCache.KeyTransform {
-    override fun transform(key: String): String {
-        return try {
-            val bytes = MessageDigest.getInstance("MD5").digest(key.toByteArray())
-            bytes.joinToString("") { "%02X".format(it) }
-        } catch (e: Exception) {
-            key
-        }
-    }
+private fun md5(key: String): String {
+    val bytes = key.toByteArray()
+    return MessageDigest.getInstance("MD5")
+        .digest(bytes)
+        .joinToString("") { "%02X".format(it) }
 }
 
 private fun DiskLruCache.Editor.abortQuietly() {

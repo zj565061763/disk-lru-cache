@@ -10,7 +10,8 @@ import java.util.UUID
 
 class MainActivity : ComponentActivity() {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
-    private val _cache by lazy { FDiskLruCache(externalCacheDir!!) }
+
+    private val _cache by lazy { FDiskLruCache.create(externalCacheDir!!) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

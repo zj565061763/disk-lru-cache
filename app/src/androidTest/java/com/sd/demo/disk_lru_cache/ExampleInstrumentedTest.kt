@@ -58,9 +58,9 @@ class ExampleInstrumentedTest {
         assertEquals(null, cacheRemove.get("key"))
     }
 
-    private fun getCache(): FDiskLruCache {
+    private fun getCache(): IDiskLruCache {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val directory = context.externalCacheDir!!
-        return FDiskLruCache(directory)
+        return FDiskLruCache.create(directory)
     }
 }
