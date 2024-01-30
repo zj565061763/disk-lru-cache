@@ -926,7 +926,7 @@ public final class DiskLruCache implements Closeable {
   }
 
   /**
-   * A {@link java.util.concurrent.ThreadFactory} that builds a thread with a specific thread name
+   * A {@link ThreadFactory} that builds a thread with a specific thread name
    * and with minimum priority.
    */
   private static final class DiskLruCacheThreadFactory implements ThreadFactory {
