@@ -18,7 +18,7 @@ interface IDiskLruCache {
     fun put(key: String, file: File?): Boolean
 
     /**
-     * 获取[key]对应的缓存文件，返回的文件只能读取，不能做修改和删除
+     * 获取[key]对应的缓存文件，返回的文件只能读取，不能修改和删除
      */
     fun get(key: String): File?
 
