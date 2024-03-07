@@ -1,9 +1,9 @@
 package com.sd.lib.dlcache
 
+import android.util.Base64
 import com.sd.lib.closeable.FAutoCloseFactory
 import java.io.File
 import java.io.IOException
-import java.security.MessageDigest
 
 interface IDiskLruCache {
     /**
@@ -186,16 +186,16 @@ private class DiskLruCacheImpl(
 
     private fun transformKey(key: String): String {
         require(key.isNotEmpty())
-        return md5(key).also {
+        return key.encodeKey().also {
             check(it.isNotEmpty()) { "transform key is empty" }
         }
     }
 }
 
-private fun md5(content: String): String {
-    return MessageDigest.getInstance("MD5")
-        .digest(content.toByteArray())
-        .joinToString("") { "%02X".format(it) }
+private fun String.encodeKey(): String {
+    val input = this.toByteArray()
+    val flag = Base64.URL_SAFE or Base64.NO_WRAP
+    return Base64.encode(input, flag).decodeToString()
 }
 
 private fun DiskLruCache.Editor.abortQuietly() {
