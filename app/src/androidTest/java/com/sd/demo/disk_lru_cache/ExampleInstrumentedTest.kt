@@ -4,11 +4,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sd.lib.dlcache.FDiskLruCache
 import com.sd.lib.dlcache.IDiskLruCache
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
-import java.util.*
+import java.util.UUID
 
 /**
  * Instrumented test, which will execute on an Android device.
@@ -42,20 +42,22 @@ class ExampleInstrumentedTest {
             writeText(fileContent)
         }
 
+        val key = "key key *./"
+
         // put
-        assertEquals(true, cachePut.put("key", tempFile))
+        assertEquals(true, cachePut.put(key, tempFile))
         tempFile.delete()
 
         // get
-        assertEquals(fileContent, cachePut.get("key")?.readText())
-        assertEquals(fileContent, cacheGet.get("key")?.readText())
-        assertEquals(fileContent, cacheRemove.get("key")?.readText())
+        assertEquals(fileContent, cachePut.get(key)?.readText())
+        assertEquals(fileContent, cacheGet.get(key)?.readText())
+        assertEquals(fileContent, cacheRemove.get(key)?.readText())
 
         // remove
-        assertEquals(true, cacheRemove.remove("key"))
-        assertEquals(null, cachePut.get("key"))
-        assertEquals(null, cacheGet.get("key"))
-        assertEquals(null, cacheRemove.get("key"))
+        assertEquals(true, cacheRemove.remove(key))
+        assertEquals(null, cachePut.get(key))
+        assertEquals(null, cacheGet.get(key))
+        assertEquals(null, cacheRemove.get(key))
     }
 
     private fun getCache(): IDiskLruCache {
