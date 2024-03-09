@@ -5,7 +5,7 @@ import com.sd.lib.closeable.FAutoCloseFactory
 import java.io.File
 import java.io.IOException
 
-interface IDiskLruCache {
+interface FDiskLruCache {
     /**
      * 设置缓存最大值，单位byte
      */
@@ -35,19 +35,19 @@ interface IDiskLruCache {
      * 编辑[key]对应的缓存文件，[block]返回true表示编辑成功
      */
     fun edit(key: String, block: (editFile: File) -> Boolean): Boolean
-}
 
-object FDiskLruCache {
-    private val _factory = FAutoCloseFactory(CloseableDiskLruCache::class.java)
+    companion object {
+        private val sFactory = FAutoCloseFactory(CloseableDiskLruCache::class.java)
 
-    @JvmStatic
-    fun get(directory: File): IDiskLruCache {
-        val path = directory.absolutePath
-        return _factory.create(path) { DiskLruCacheImpl(directory) }
+        @JvmStatic
+        fun get(directory: File): FDiskLruCache {
+            val path = directory.absolutePath
+            return sFactory.create(path) { DiskLruCacheImpl(directory) }
+        }
     }
 }
 
-private interface CloseableDiskLruCache : IDiskLruCache, AutoCloseable
+private interface CloseableDiskLruCache : FDiskLruCache, AutoCloseable
 
 private class DiskLruCacheImpl(
     private val directory: File

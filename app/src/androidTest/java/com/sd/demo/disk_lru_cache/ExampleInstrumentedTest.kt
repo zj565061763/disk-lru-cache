@@ -3,7 +3,6 @@ package com.sd.demo.disk_lru_cache
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sd.lib.dlcache.FDiskLruCache
-import com.sd.lib.dlcache.IDiskLruCache
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,9 +32,9 @@ class ExampleInstrumentedTest {
     }
 
     private fun testPutGetRemove(
-        cachePut: IDiskLruCache,
-        cacheGet: IDiskLruCache,
-        cacheRemove: IDiskLruCache,
+        cachePut: FDiskLruCache,
+        cacheGet: FDiskLruCache,
+        cacheRemove: FDiskLruCache,
     ) {
         val fileContent = UUID.randomUUID().toString()
         val tempFile = File.createTempFile("lru", ".tmp").apply {
@@ -60,7 +59,7 @@ class ExampleInstrumentedTest {
         assertEquals(null, cacheRemove.get(key))
     }
 
-    private fun getCache(): IDiskLruCache {
+    private fun getCache(): FDiskLruCache {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val directory = context.externalCacheDir!!
         return FDiskLruCache.get(directory)

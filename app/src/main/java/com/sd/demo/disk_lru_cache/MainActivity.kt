@@ -5,16 +5,15 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import com.sd.demo.disk_lru_cache.databinding.ActivityMainBinding
 import com.sd.lib.dlcache.FDiskLruCache
-import com.sd.lib.dlcache.IDiskLruCache
 import java.io.File
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
     private val _binding by lazy { ActivityMainBinding.inflate(layoutInflater) }
 
-    private var _cache: IDiskLruCache? = null
+    private var _cache: FDiskLruCache? = null
 
-    private val cache: IDiskLruCache
+    private val cache: FDiskLruCache
         get() = _cache ?: FDiskLruCache.get(externalCacheDir!!).also { _cache = it }
 
     override fun onCreate(savedInstanceState: Bundle?) {
