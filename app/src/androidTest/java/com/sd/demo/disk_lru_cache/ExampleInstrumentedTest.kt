@@ -1,9 +1,15 @@
 package com.sd.demo.disk_lru_cache
 
+import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.sd.lib.dlcache.FDiskLruCache
+import io.mockk.every
+import io.mockk.mockkStatic
+import io.mockk.unmockkAll
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -16,6 +22,17 @@ import java.util.UUID
  */
 @RunWith(AndroidJUnit4::class)
 class ExampleInstrumentedTest {
+
+    @Before
+    fun setUp() {
+        mockkStatic(Looper::class)
+        every { Looper.myLooper() } returns Looper.getMainLooper()
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
+    }
 
     @Test
     fun testCache() {

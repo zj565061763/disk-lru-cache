@@ -29,6 +29,15 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    packaging {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
+            )
+        )
+    }
 }
 
 kotlin {
@@ -41,6 +50,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.mockk.agent)
 
     implementation(project(":lib"))
 }
