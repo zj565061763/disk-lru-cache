@@ -186,17 +186,21 @@ private class DiskLruCacheImpl(
 
     private fun transformKey(key: String): String {
         require(key.isNotEmpty())
-        return key.md5().also {
+        return md5(key).also {
             check(it.isNotEmpty()) { "transform key is empty" }
         }
     }
 }
 
-private fun String.md5(): String {
-    val input = this.toByteArray()
-    return MessageDigest.getInstance("MD5")
-        .digest(input)
-        .joinToString("") { "%02X".format(it) }
+private fun md5(input: String): String {
+    val md5Bytes = MessageDigest.getInstance("MD5").digest(input.toByteArray())
+    return buildString {
+        for (byte in md5Bytes) {
+            val hex = Integer.toHexString(0xff and byte.toInt())
+            if (hex.length == 1) append("0")
+            append(hex)
+        }
+    }
 }
 
 private fun DiskLruCache.Editor.abortQuietly() {
