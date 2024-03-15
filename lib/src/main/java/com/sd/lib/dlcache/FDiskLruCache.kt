@@ -76,7 +76,7 @@ private class DiskLruCacheImpl(
             try {
                 file.copyTo(editFile, overwrite = true)
                 true
-            } catch (e: Exception) {
+            } catch (e: IOException) {
                 false
             }
         }
