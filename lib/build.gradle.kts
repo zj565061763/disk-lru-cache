@@ -6,7 +6,7 @@ plugins {
 
 val libGroupId = "com.sd.lib.android"
 val libArtifactId = "disk-lru-cache"
-val libVersionName = "1.4.1"
+val libVersionName = "1.5.0"
 
 android {
     namespace ="com.sd.lib.dlcache"
