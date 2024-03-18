@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
     private var _cache: FDiskLruCache? = null
 
     private val cache: FDiskLruCache
-        get() = _cache ?: FDiskLruCache.get(externalCacheDir!!).also { _cache = it }
+        get() = _cache ?: FDiskLruCache.limitSize(externalCacheDir!!).also { _cache = it }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

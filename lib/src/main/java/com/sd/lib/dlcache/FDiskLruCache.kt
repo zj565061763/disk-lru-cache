@@ -7,7 +7,7 @@ import java.security.MessageDigest
 
 interface FDiskLruCache {
     /**
-     * 设置缓存最大值，单位byte
+     * 设置缓存最大值
      */
     fun setMaxSize(maxSize: Long)
 
@@ -39,8 +39,11 @@ interface FDiskLruCache {
     companion object {
         private val sFactory = FAutoCloseFactory(CloseableDiskLruCache::class.java)
 
+        /**
+         * 限制大小的缓存(byte)
+         */
         @JvmStatic
-        fun get(directory: File): FDiskLruCache {
+        fun limitSize(directory: File): FDiskLruCache {
             val path = directory.absolutePath
             return sFactory.create(path) { DiskLruCacheImpl(directory) }
         }
