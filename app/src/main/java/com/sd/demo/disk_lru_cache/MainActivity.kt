@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import com.sd.demo.disk_lru_cache.databinding.ActivityMainBinding
 import com.sd.lib.dlcache.FDiskLruCache
-import java.io.File
 import java.util.UUID
 
 class MainActivity : ComponentActivity() {
@@ -14,7 +13,7 @@ class MainActivity : ComponentActivity() {
     private var _cache: FDiskLruCache? = null
 
     private val cache: FDiskLruCache
-        get() = _cache ?: FDiskLruCache.limitSize(externalCacheDir!!).also { _cache = it }
+        get() = _cache ?: FDiskLruCache.limitSize(externalCacheDir!!.resolve("lru")).also { _cache = it }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,12 +34,12 @@ class MainActivity : ComponentActivity() {
 
     private fun putCache() {
         val fileContent = UUID.randomUUID().toString()
-        val tempFile = File.createTempFile("lru", ".tmp").apply {
+        val file = filesDir.resolve("temp").apply {
             writeText(fileContent)
         }
 
-        val put = cache.put("key", tempFile)
-        tempFile.delete()
+        val put = cache.put("key", file)
+        file.delete()
 
         logMsg { "putCache $fileContent $put" }
     }
